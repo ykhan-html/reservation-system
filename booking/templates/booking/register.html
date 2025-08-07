@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - 예약 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+        }
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .auth-body {
+            padding: 40px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .password-requirements {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-calendar-check me-2"></i>예약 시스템
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" id="booking-link" style="display: none;">
+                        <a class="nav-link" href="/#booking">예약하기</a>
+                    </li>
+                    <li class="nav-item" id="login-link">
+                        <a class="nav-link" href="/login/">로그인</a>
+                    </li>
+                    <li class="nav-item" id="register-link">
+                        <a class="nav-link" href="/register/">회원가입</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/provider-login/"><i class="fas fa-user-tie"></i> 쌤로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">관리자</a>
+                    </li>
+                    <li class="nav-item" id="profile-link" style="display: none;">
+                        <a class="nav-link" href="/profile/">회원관리</a>
+                    </li>
+                    <li class="nav-item" id="product-management-link" style="display: none;">
+                        <a class="nav-link" href="/product-management/"><i class="fas fa-box"></i> 상품관리</a>
+                    </li>
+                    <li class="nav-item" id="provider-management-link" style="display: none;">
+                        <a class="nav-link" href="/provider-management/"><i class="fas fa-users"></i> 제공자관리</a>
+                    </li>
+                    <li class="nav-item" id="logout-link" style="display: none;">
+                        <a class="nav-link" href="#" onclick="logout()">로그아웃</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2><i class="fas fa-user-plus me-2"></i>회원가입</h2>
+                <p class="mb-0">예약 시스템에 가입하세요</p>
+            </div>
+            <div class="auth-body">
+                <form id="register-form">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">아이디 *</label>
+                        <input type="text" class="form-control" id="username" name="username" required autocomplete="off">
+                        <div class="form-text">영문, 숫자, 언더스코어만 사용 가능합니다.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일 *</label>
+                        <input type="email" class="form-control" id="email" name="email" required autocomplete="off">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">성명</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="홍길동" autocomplete="off">
+                        <div class="form-text">실명을 입력해주세요.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">비밀번호 *</label>
+                        <input type="password" class="form-control" id="password" name="password" required autocomplete="new-password">
+                        <div class="password-requirements">
+                            <small>비밀번호는 최소 8자 이상이어야 하며, 숫자만으로 구성할 수 없습니다.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password2" class="form-label">비밀번호 확인 *</label>
+                        <input type="password" class="form-control" id="password2" name="password2" required autocomplete="new-password">
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>회원가입
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">이미 계정이 있으신가요? 
+                            <a href="/login/" class="text-decoration-none">로그인</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                full_name: document.getElementById('full_name').value,
+                password: document.getElementById('password').value,
+                password2: document.getElementById('password2').value
+            };
+            
+            try {
+                const response = await fetch('/api/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+                    window.location.href = '/login/';
+                } else {
+                    let errorMessage = '회원가입 중 오류가 발생했습니다.';
+                    if (data.error) {
+                        errorMessage = data.error;
+                    } else if (typeof data === 'object') {
+                        const errors = [];
+                        for (const [field, messages] of Object.entries(data)) {
+                            if (Array.isArray(messages)) {
+                                errors.push(`${field}: ${messages.join(', ')}`);
+                            }
+                        }
+                        errorMessage = errors.join('\n');
+                    }
+                    alert(errorMessage);
+                }
+            } catch (error) {
+                console.error('회원가입 실패:', error);
+                alert('회원가입 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 사용자 인증 상태 확인 및 네비게이션 업데이트
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/users/', { credentials: 'include' });
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.length > 0) {
+                        const user = userData[0];
+                        
+                        // 로그인된 사용자 정보 표시
+                        const loginLink = document.getElementById('login-link');
+                        const registerLink = document.getElementById('register-link');
+                        const logoutLink = document.getElementById('logout-link');
+                        const profileLink = document.getElementById('profile-link');
+                        const productManagementLink = document.getElementById('product-management-link');
+                        const providerManagementLink = document.getElementById('provider-management-link');
+                        
+                        // 로그인/회원가입 링크 숨기기
+                        if (loginLink) {
+                            loginLink.style.display = 'none';
+                        }
+                        if (registerLink) {
+                            registerLink.style.display = 'none';
+                        }
+                        
+                        // 로그아웃 링크 표시
+                        if (logoutLink) {
+                            logoutLink.style.display = 'block';
+                        }
+                        
+                        // 로그인 시 예약하기 링크 표시
+                        const bookingLink = document.getElementById('booking-link');
+                        if (bookingLink) {
+                            bookingLink.style.display = 'block';
+                        }
+                        
+                        if (profileLink) {
+                            profileLink.style.display = 'block';
+                        }
+                        
+                        // 관리자 권한 확인 (staff 권한이 있는 경우)
+                        if (user.is_staff) {
+                            if (productManagementLink) {
+                                productManagementLink.style.display = 'block';
+                            }
+                            if (providerManagementLink) {
+                                providerManagementLink.style.display = 'block';
+                            }
+                        }
+                    }
+                } else {
+                    // 로그인되지 않은 경우 로그인/회원가입 링크 표시, 로그아웃 링크 숨기기
+                    const loginLink = document.getElementById('login-link');
+                    const registerLink = document.getElementById('register-link');
+                    const logoutLink = document.getElementById('logout-link');
+                    const bookingLink = document.getElementById('booking-link');
+                    
+                    if (loginLink) {
+                        loginLink.style.display = 'block';
+                    }
+                    if (registerLink) {
+                        registerLink.style.display = 'block';
+                    }
+                    if (logoutLink) {
+                        logoutLink.style.display = 'none';
+                    }
+                    if (bookingLink) {
+                        bookingLink.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.log('인증되지 않은 사용자');
+                // 에러 발생 시에도 로그인/회원가입 링크 표시, 로그아웃 링크 숨기기
+                const loginLink = document.getElementById('login-link');
+                const registerLink = document.getElementById('register-link');
+                const logoutLink = document.getElementById('logout-link');
+                const bookingLink = document.getElementById('booking-link');
+                
+                if (loginLink) {
+                    loginLink.style.display = 'block';
+                }
+                if (registerLink) {
+                    registerLink.style.display = 'block';
+                }
+                if (logoutLink) {
+                    logoutLink.style.display = 'none';
+                }
+                if (bookingLink) {
+                    bookingLink.style.display = 'none';
+                }
+            }
+        }
+
+        // 로그아웃 함수
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    alert('로그아웃되었습니다.');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('로그아웃 실패:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // CSRF 토큰 가져오기
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // 페이지 로드 시 인증 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
+    </script>
+</body>
+</html> 

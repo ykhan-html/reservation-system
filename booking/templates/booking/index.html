@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>골프레슨 예약 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --accent: #10b981;
+            --dark: #111827;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1e293b 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            color: var(--primary) !important;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            color: var(--light) !important;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            margin: 0 0.25rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* 히어로 섹션 */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            padding: 140px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(-10px) rotate(-1deg); }
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 3rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 카드 스타일 */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.35);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-bottom: none;
+            font-weight: 700;
+            padding: 1.5rem;
+        }
+
+        /* 폼 스타일 */
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--light);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            color: var(--light);
+        }
+
+        /* 선택창 스타일 개선 */
+        .form-select {
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--light);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-select:focus {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--light);
+            border-color: var(--primary);
+        }
+
+        /* 선택창 옵션 스타일 */
+        .form-select option {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--light);
+            padding: 0.5rem;
+        }
+
+        .form-select option:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: rgba(248, 250, 252, 0.6);
+        }
+
+        .form-label {
+            color: var(--light);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 버튼 스타일 */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 12px;
+            padding: 0.875rem 1.75rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        /* 서비스 카드 */
+        .service-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .service-card:hover::before {
+            left: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-icon {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-title {
+            color: var(--light);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .service-price {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* 알림 스타일 */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #bbf7d0;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fecaca;
+            border-left: 4px solid var(--danger);
+        }
+
+        /* 섹션 구분선 */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            margin: 4rem 0;
+            opacity: 0.3;
+        }
+
+        /* 푸터 */
+        .footer {
+            background: var(--darker);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 5rem;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .service-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* 로딩 애니메이션 */
+        .loading-spinner {
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 스크롤바 커스터마이징 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* 텍스트 유틸리티 */
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .text-light {
+            color: var(--light) !important;
+        }
+
+        .text-gray {
+            color: var(--gray) !important;
+        }
+
+        /* 네온 효과 */
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* 그라데이션 텍스트 */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 플로팅 애니메이션 */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float-slow 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-golf-ball me-2"></i>GolfPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" id="booking-link" style="display: none;">
+                        <a class="nav-link" href="#booking">예약하기</a>
+                    </li>
+                    <li class="nav-item" id="login-link">
+                        <a class="nav-link" href="/login/">로그인</a>
+                    </li>
+                    <li class="nav-item" id="register-link">
+                        <a class="nav-link" href="/register/">회원가입</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/provider-login/"><i class="fas fa-user-tie"></i> 쌤로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">관리자</a>
+                    </li>
+                    <li class="nav-item" id="profile-link" style="display: none;">
+                        <a class="nav-link" href="/profile/">회원관리</a>
+                    </li>
+                    <li class="nav-item" id="product-management-link" style="display: none;">
+                        <a class="nav-link" href="/product-management/"><i class="fas fa-box"></i> 상품관리</a>
+                    </li>
+                    <li class="nav-item" id="provider-management-link" style="display: none;">
+                        <a class="nav-link" href="/provider-management/"><i class="fas fa-users"></i> 제공자관리</a>
+                    </li>
+                    <li class="nav-item" id="logout-link" style="display: none;">
+                        <a class="nav-link" href="#" onclick="logout()">로그아웃</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 히어로 섹션 -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h1 class="hero-title float-animation">Next Level Golf</h1>
+                    <p class="hero-subtitle">프로와 함께하는 차세대 골프 레슨을 경험하세요</p>
+                    <div class="mt-5">
+                        <a href="#booking" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-calendar-check me-2"></i>지금 예약하기
+                        </a>
+                        <a href="#services" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-info-circle me-2"></i>레슨 안내
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 서비스 섹션 -->
+    <section id="services" class="py-5">
+        <div class="container">
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-8 text-center">
+                    <h2 class="gradient-text mb-4">Premium Lessons</h2>
+                    <p class="text-gray">개인 맞춤형 골프 레슨으로 실력을 향상시켜보세요</p>
+                </div>
+            </div>
+            <div class="row" id="services-container">
+                <div class="col-12 text-center">
+                    <div class="loading-spinner mx-auto"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- 예약 섹션 -->
+    <section id="booking" class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card neon-glow">
+                        <div class="card-header text-center">
+                            <h3 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>골프레슨 예약</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <div id="alert-container"></div>
+                            
+                            <form id="booking-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="booking-service" class="form-label">레슨 종류</label>
+                                        <select class="form-select" id="booking-service" required>
+                                            <option value="">레슨을 선택하세요</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="booking-provider" class="form-label">프로 선택</label>
+                                        <select class="form-select" id="booking-provider" required>
+                                            <option value="">프로를 선택하세요</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="booking-date" class="form-label">예약 날짜</label>
+                                        <input type="date" class="form-control" id="booking-date" required>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="booking-time" class="form-label">예약 시간 (30분 단위)</label>
+                                        <select class="form-select" id="booking-time" required>
+                                            <option value="">날짜를 먼저 선택하세요</option>
+                                        </select>
+                                        <div class="form-text text-gray">30분 단위로 예약 가능합니다.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="booking-notes" class="form-label">특이사항</label>
+                                    <textarea class="form-control" id="booking-notes" rows="3" placeholder="레슨 시 집중하고 싶은 부분이나 특별한 요청사항이 있으시면 적어주세요."></textarea>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-check me-2"></i>예약 완료
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="gradient-text">GolfPro</h5>
+                    <p class="text-gray">프로와 함께하는 차세대 골프 레슨</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-gray mb-0">
+                        <i class="fas fa-phone me-2"></i>문의: 02-1234-5678<br>
+                        <i class="fas fa-envelope me-2"></i>이메일: info@golfpro.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 기존 JavaScript 코드는 그대로 유지
+        let services = [];
+        let providers = [];
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/users/', { credentials: 'include' });
+                const loginLink = document.getElementById('login-link');
+                const registerLink = document.getElementById('register-link');
+                const logoutLink = document.getElementById('logout-link');
+                const profileLink = document.getElementById('profile-link');
+                const productManagementLink = document.getElementById('product-management-link');
+                const providerManagementLink = document.getElementById('provider-management-link');
+                const bookingLink = document.getElementById('booking-link');
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.length > 0) {
+                        const user = userData[0];
+                        
+                        // 로그인 상태: 로그인/회원가입 숨기고, 로그아웃/회원관리/예약하기 표시
+                        if (loginLink) loginLink.style.display = 'none';
+                        if (registerLink) registerLink.style.display = 'none';
+                        if (logoutLink) logoutLink.style.display = 'block';
+                        if (profileLink) profileLink.style.display = 'block';
+                        if (bookingLink) bookingLink.style.display = 'block';
+                        
+                        // 관리자 메뉴 표시
+                        if (user.is_staff) {
+                            if (productManagementLink) productManagementLink.style.display = 'block';
+                            if (providerManagementLink) providerManagementLink.style.display = 'block';
+                        } else {
+                            if (productManagementLink) productManagementLink.style.display = 'none';
+                            if (providerManagementLink) providerManagementLink.style.display = 'none';
+                        }
+                        
+                        // 환영 메시지 업데이트 (로그아웃 링크 옆에 표시)
+                        if (logoutLink) {
+                            const welcomeSpan = document.createElement('span');
+                            welcomeSpan.className = 'navbar-text me-3';
+                            welcomeSpan.textContent = `안녕하세요, ${user.full_name || user.username}님!`;
+                            logoutLink.parentNode.insertBefore(welcomeSpan, logoutLink);
+                        }
+                    }
+                } else {
+                    // 로그아웃 상태: 로그인/회원가입 표시, 로그아웃/회원관리/예약하기 숨김
+                    if (loginLink) loginLink.style.display = 'block';
+                    if (registerLink) registerLink.style.display = 'block';
+                    if (logoutLink) logoutLink.style.display = 'none';
+                    if (profileLink) profileLink.style.display = 'none';
+                    if (bookingLink) bookingLink.style.display = 'none';
+                    if (productManagementLink) productManagementLink.style.display = 'none';
+                    if (providerManagementLink) providerManagementLink.style.display = 'none';
+                    
+                    // 환영 메시지 제거
+                    const existingWelcomeSpan = document.querySelector('.navbar-text.me-3');
+                    if (existingWelcomeSpan) {
+                        existingWelcomeSpan.remove();
+                    }
+                }
+            } catch (error) {
+                console.log('인증되지 않은 사용자 또는 오류:', error);
+                // 오류 발생 시에도 로그아웃 상태로 처리
+                const loginLink = document.getElementById('login-link');
+                const registerLink = document.getElementById('register-link');
+                const logoutLink = document.getElementById('logout-link');
+                const profileLink = document.getElementById('profile-link');
+                const bookingLink = document.getElementById('booking-link');
+                const productManagementLink = document.getElementById('product-management-link');
+                const providerManagementLink = document.getElementById('provider-management-link');
+                
+                if (loginLink) loginLink.style.display = 'block';
+                if (registerLink) registerLink.style.display = 'block';
+                if (logoutLink) logoutLink.style.display = 'none';
+                if (profileLink) profileLink.style.display = 'none';
+                if (bookingLink) bookingLink.style.display = 'none';
+                if (productManagementLink) productManagementLink.style.display = 'none';
+                if (providerManagementLink) providerManagementLink.style.display = 'none';
+                
+                const existingWelcomeSpan = document.querySelector('.navbar-text.me-3');
+                if (existingWelcomeSpan) {
+                    existingWelcomeSpan.remove();
+                }
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    showAlert('로그아웃에 실패했습니다.', 'danger');
+                }
+            } catch (error) {
+                console.error('로그아웃 오류:', error);
+                showAlert('로그아웃 중 오류가 발생했습니다.', 'danger');
+            }
+        }
+
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services/');
+                if (response.ok) {
+                    services = await response.json();
+                    displayServices();
+                    populateServiceSelect();
+                }
+            } catch (error) {
+                console.error('서비스 로드 실패:', error);
+            }
+        }
+
+        async function loadProviders() {
+            try {
+                const response = await fetch('/api/providers/active/');
+                if (response.ok) {
+                    providers = await response.json();
+                    populateProviderSelect();
+                }
+            } catch (error) {
+                console.error('제공자 로드 실패:', error);
+            }
+        }
+
+        function displayServices() {
+            const container = document.getElementById('services-container');
+            if (services.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-gray">등록된 레슨이 없습니다.</p></div>';
+                return;
+            }
+
+            const servicesHTML = services.map(service => `
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-golf-ball"></i>
+                        </div>
+                        <h5 class="service-title">${service.name}</h5>
+                        <p class="text-gray mb-3">${service.description}</p>
+                        <div class="service-price">${service.price.toLocaleString()}원</div>
+                        <div class="mt-3">
+                            <small class="text-gray">
+                                <i class="fas fa-clock me-1"></i>${service.duration}분
+                                ${service.provider ? `<br><i class="fas fa-user me-1"></i>${service.provider.name}` : ''}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = servicesHTML;
+        }
+
+        function populateServiceSelect() {
+            const select = document.getElementById('booking-service');
+            select.innerHTML = '<option value="">레슨을 선택하세요</option>';
+            
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                option.textContent = `${service.name} - ${service.price.toLocaleString()}원`;
+                select.appendChild(option);
+            });
+        }
+
+        function populateProviderSelect() {
+            const select = document.getElementById('booking-provider');
+            select.innerHTML = '<option value="">프로를 선택하세요</option>';
+            
+            providers.forEach(provider => {
+                const option = document.createElement('option');
+                option.value = provider.id;
+                option.textContent = provider.name;
+                select.appendChild(option);
+            });
+        }
+
+        async function loadAvailableTimes() {
+            const serviceId = document.getElementById('booking-service').value;
+            const date = document.getElementById('booking-date').value;
+            const timeSelect = document.getElementById('booking-time');
+            
+            if (!serviceId || !date) {
+                timeSelect.innerHTML = '<option value="">날짜를 먼저 선택하세요</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/services/${serviceId}/available_times/?date=${date}`);
+                if (response.ok) {
+                    const times = await response.json();
+                    
+                    if (times.length === 0) {
+                        timeSelect.innerHTML = '<option value="">해당 날짜에 예약 가능한 시간이 없습니다.</option>';
+                    } else {
+                        timeSelect.innerHTML = '<option value="">시간을 선택하세요</option>';
+                        times.forEach(time => {
+                            const option = document.createElement('option');
+                            option.value = time;
+                            option.textContent = time;
+                            timeSelect.appendChild(option);
+                        });
+                    }
+                } else {
+                    timeSelect.innerHTML = '<option value="">시간을 불러올 수 없습니다.</option>';
+                }
+            } catch (error) {
+                console.error('시간 로드 실패:', error);
+                timeSelect.innerHTML = '<option value="">시간을 불러올 수 없습니다.</option>';
+            }
+        }
+
+        document.getElementById('booking-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                service_id: parseInt(document.getElementById('booking-service').value),
+                provider_id: parseInt(document.getElementById('booking-provider').value),
+                date: document.getElementById('booking-date').value,
+                time: document.getElementById('booking-time').value,
+                notes: document.getElementById('booking-notes').value
+            };
+
+            try {
+                const response = await fetch('/api/reservations/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showAlert('골프레슨이 성공적으로 예약되었습니다!', 'success');
+                    document.getElementById('booking-form').reset();
+                    document.getElementById('booking-time').innerHTML = '<option value="">날짜를 먼저 선택하세요</option>';
+                } else {
+                    const error = await response.json();
+                    showAlert(`예약 실패: ${JSON.stringify(error)}`, 'danger');
+                }
+            } catch (error) {
+                console.error('예약 오류:', error);
+                showAlert('예약 중 오류가 발생했습니다.', 'danger');
+            }
+        });
+
+        // 이벤트 리스너
+        document.getElementById('booking-service').addEventListener('change', loadAvailableTimes);
+        document.getElementById('booking-date').addEventListener('input', loadAvailableTimes);
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            loadServices();
+            loadProviders();
+        });
+    </script>
+</body>
+</html> 
