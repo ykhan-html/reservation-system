@@ -10,6 +10,17 @@
         body {
             background-color: #f8f9fa;
         }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #fff !important;
+        }
+        
+        .navbar-brand i {
+            color: #ffd700;
+        }
+        
         .sidebar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
@@ -25,7 +36,7 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
         .main-content {
-            padding: 2rem;
+            padding: 1rem;
         }
         .card {
             border: none;
@@ -49,8 +60,8 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
         .logout-btn {
             background: rgba(255, 255, 255, 0.2);
@@ -61,15 +72,66 @@
             background: rgba(255, 255, 255, 0.3);
             color: white;
         }
+        
+        /* 모바일 반응형 개선 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 0.5rem;
+            }
+            .provider-info {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+            .sidebar {
+                min-height: auto;
+            }
+            .container-fluid {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .col-md-3, .col-md-9, .col-lg-2, .col-lg-10 {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-golf-ball me-2"></i>GolfPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> 홈으로</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/provider-login/"><i class="fas fa-user-tie"></i> 쌤로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/"><i class="fas fa-cog"></i> 관리자</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 sidebar p-3">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4><i class="fas fa-user-tie"></i> 제공자 패널</h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-user-tie"></i> 제공자 패널</h5>
                     <button class="btn btn-sm logout-btn" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
@@ -95,8 +157,8 @@
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="fas fa-calendar-check"></i> 예약 현황</h2>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-calendar-check"></i> 예약 현황</h3>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-outline-primary" onclick="filterReservations('all')">전체</button>
                         <button type="button" class="btn btn-outline-warning" onclick="filterReservations('pending')">대기중</button>
@@ -117,7 +179,6 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>예약 ID</th>
                                         <th>고객명</th>
                                         <th>서비스</th>
                                         <th>날짜</th>
@@ -129,7 +190,7 @@
                                 </thead>
                                 <tbody id="reservations-table">
                                     <tr>
-                                        <td colspan="8" class="text-center">로딩 중...</td>
+                                        <td colspan="7" class="text-center">로딩 중...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -248,7 +309,7 @@
             const tbody = document.getElementById('reservations-table');
             
             if (reservationsToShow.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center">예약이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">예약이 없습니다.</td></tr>';
                 return;
             }
 
@@ -269,7 +330,6 @@
 
                 return `
                     <tr>
-                        <td>#${reservation.id}</td>
                         <td>${reservation.user.full_name || reservation.user.username}</td>
                         <td>${reservation.service.name}</td>
                         <td>${reservation.date}</td>
@@ -322,7 +382,30 @@
                 });
 
                 if (response.ok) {
-                    showAlert('예약 상태가 성공적으로 변경되었습니다.', 'success');
+                    const data = await response.json();
+                    
+                    // 시간대 업데이트 정보가 있는 경우 처리
+                    if (data.time_slot_updated && data.available_times) {
+                        showAlert(`${data.message} 시간대가 업데이트되었습니다.`, 'success');
+                        
+                        // 메인 페이지의 예약 시간대를 실시간으로 업데이트
+                        // localStorage를 통해 메인 페이지에 알림
+                        const updateInfo = {
+                            type: 'time_slot_update',
+                            date: data.date,
+                            available_times: data.available_times,
+                            timestamp: Date.now()
+                        };
+                        localStorage.setItem('timeSlotUpdate', JSON.stringify(updateInfo));
+                        
+                        // 메인 페이지가 열려있다면 직접 이벤트 발생
+                        if (window.opener && !window.opener.closed) {
+                            window.opener.postMessage(updateInfo, '*');
+                        }
+                    } else {
+                        showAlert('예약 상태가 성공적으로 변경되었습니다.', 'success');
+                    }
+                    
                     statusModal.hide();
                     loadReservations(); // 목록 새로고침
                 } else {

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Service, Reservation, Review, BusinessHours, Category, ServiceProvider
+from .models import Service, Reservation, Review, BusinessHours, Category, ServiceProvider, Notice
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -90,6 +90,12 @@ class BusinessHoursSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class NoticeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notice
+        fields = ['id', 'title', 'content', 'priority', 'is_active', 'is_pinned', 'created_at', 'updated_at']
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(source='reservation.user', read_only=True)
     service_name = serializers.CharField(source='reservation.service.name', read_only=True)
@@ -104,7 +110,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(read_only=True)
     service_id = serializers.IntegerField(write_only=True)
     provider = ServiceProviderSerializer(read_only=True)
-    provider_id = serializers.IntegerField(write_only=True)
+    provider_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     review = ReviewSerializer(read_only=True)
 
@@ -118,7 +124,11 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         service_id = validated_data.pop('service_id')
+        provider_id = validated_data.pop('provider_id', None)
+        
         validated_data['service_id'] = service_id
+        if provider_id:
+            validated_data['provider_id'] = provider_id
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 

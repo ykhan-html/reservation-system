@@ -73,6 +73,7 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            z-index: 0;
         }
 
         .hero-section::before {
@@ -87,6 +88,25 @@
                 radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
             animation: float 6s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        /* 히어로 섹션 내 버튼들의 z-index 설정 */
+        .hero-section .btn {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 모바일에서 버튼 간격 조정 */
+        @media (max-width: 768px) {
+            .hero-section .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 1rem !important;
+            }
+            .hero-section .btn:last-child {
+                margin-bottom: 0 !important;
+            }
         }
 
         @keyframes float {
@@ -210,6 +230,7 @@
             box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
             position: relative;
             overflow: hidden;
+            z-index: 2;
         }
 
         .btn-primary::before {
@@ -240,6 +261,7 @@
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: transparent;
+            z-index: 2;
         }
 
         .btn-outline-primary:hover {
@@ -416,6 +438,92 @@
             background-clip: text;
         }
 
+        /* 레슨 안내 모달 스타일 */
+        .notice-modal .modal-content {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+        
+        .notice-modal .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            padding: 1.5rem 2rem;
+            position: relative;
+        }
+        
+        .notice-modal .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+        
+        .notice-modal .modal-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notice-modal .modal-body {
+            padding: 2rem;
+            background: #fafbfc;
+        }
+        
+        .notice-modal .modal-footer {
+            border: none;
+            padding: 0 2rem 2rem;
+            background: #fafbfc;
+        }
+        
+        .notice-item {
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-left: 4px solid var(--primary) !important;
+            position: relative;
+        }
+        
+        .notice-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 0.5rem;
+            z-index: -1;
+        }
+        
+        .notice-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+        
+        .notice-item:hover::before {
+            opacity: 0.05;
+        }
+        
+        .notice-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
         /* 플로팅 애니메이션 */
         @keyframes float-slow {
             0%, 100% { transform: translateY(0px); }
@@ -440,7 +548,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item" id="booking-link" style="display: none;">
-                        <a class="nav-link" href="#booking">예약하기</a>
+                        <a class="nav-link" href="#" onclick="handleBookingClick(event)">예약하기</a>
                     </li>
                     <li class="nav-item" id="login-link">
                         <a class="nav-link" href="/login/">로그인</a>
@@ -479,12 +587,12 @@
                     <h1 class="hero-title float-animation">Next Level Golf</h1>
                     <p class="hero-subtitle">프로와 함께하는 차세대 골프 레슨을 경험하세요</p>
                     <div class="mt-5">
-                        <a href="#booking" class="btn btn-primary btn-lg me-3">
+                        <button type="button" id="booking-now-btn" class="btn btn-primary btn-lg me-3 mb-2">
                             <i class="fas fa-calendar-check me-2"></i>지금 예약하기
-                        </a>
-                        <a href="#services" class="btn btn-outline-primary btn-lg">
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-lg mb-2" data-bs-toggle="modal" data-bs-target="#noticeModal">
                             <i class="fas fa-info-circle me-2"></i>레슨 안내
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -510,8 +618,8 @@
 
     <div class="section-divider"></div>
 
-    <!-- 예약 섹션 -->
-    <section id="booking" class="py-5">
+    <!-- 예약 섹션 (로그인 후에만 표시) -->
+    <section id="booking" class="py-5" style="display: none;">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
@@ -570,6 +678,35 @@
         </div>
     </section>
 
+    <!-- 공지사항 모달 -->
+    <div class="modal fade notice-modal" id="noticeModal" tabindex="-1" aria-labelledby="noticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="noticeModalLabel">
+                        <i class="fas fa-bullhorn me-2"></i>레슨 안내 및 공지사항
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="notices-container">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">로딩 중...</span>
+                            </div>
+                            <p class="mt-3 text-muted">공지사항을 불러오는 중...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 푸터 -->
     <footer class="footer">
         <div class="container">
@@ -619,6 +756,31 @@
             return cookieValue;
         }
 
+        async function handleBookingClick(event) {
+            event.preventDefault();
+            
+            try {
+                const response = await fetch('/api/users/', { credentials: 'include' });
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.length > 0) {
+                        // 로그인된 상태: 예약 섹션으로 이동
+                        document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        // 로그인되지 않은 상태: 로그인 페이지로 이동
+                        window.location.href = '/login/';
+                    }
+                } else {
+                    // 로그인되지 않은 상태: 로그인 페이지로 이동
+                    window.location.href = '/login/';
+                }
+            } catch (error) {
+                console.log('인증 확인 실패:', error);
+                // 오류 발생 시 로그인 페이지로 이동
+                window.location.href = '/login/';
+            }
+        }
+
         async function checkAuthStatus() {
             try {
                 const response = await fetch('/api/users/', { credentials: 'include' });
@@ -641,6 +803,10 @@
                         if (logoutLink) logoutLink.style.display = 'block';
                         if (profileLink) profileLink.style.display = 'block';
                         if (bookingLink) bookingLink.style.display = 'block';
+                        
+                        // 예약 섹션 표시
+                        const bookingSection = document.getElementById('booking');
+                        if (bookingSection) bookingSection.style.display = 'block';
                         
                         // 관리자 메뉴 표시
                         if (user.is_staff) {
@@ -669,6 +835,10 @@
                     if (productManagementLink) productManagementLink.style.display = 'none';
                     if (providerManagementLink) providerManagementLink.style.display = 'none';
                     
+                    // 예약 섹션 숨김
+                    const bookingSection = document.getElementById('booking');
+                    if (bookingSection) bookingSection.style.display = 'none';
+                    
                     // 환영 메시지 제거
                     const existingWelcomeSpan = document.querySelector('.navbar-text.me-3');
                     if (existingWelcomeSpan) {
@@ -693,6 +863,10 @@
                 if (bookingLink) bookingLink.style.display = 'none';
                 if (productManagementLink) productManagementLink.style.display = 'none';
                 if (providerManagementLink) providerManagementLink.style.display = 'none';
+                
+                // 예약 섹션 숨김
+                const bookingSection = document.getElementById('booking');
+                if (bookingSection) bookingSection.style.display = 'none';
                 
                 const existingWelcomeSpan = document.querySelector('.navbar-text.me-3');
                 if (existingWelcomeSpan) {
@@ -816,13 +990,13 @@
                     const times = await response.json();
                     
                     if (times.length === 0) {
-                        timeSelect.innerHTML = '<option value="">해당 날짜에 예약 가능한 시간이 없습니다.</option>';
+                        timeSelect.innerHTML = '<option value="">해당 날짜에 예약 가능한 시간이 없습니다. (모든 시간 마감)</option>';
                     } else {
                         timeSelect.innerHTML = '<option value="">시간을 선택하세요</option>';
                         times.forEach(time => {
                             const option = document.createElement('option');
                             option.value = time;
-                            option.textContent = time;
+                            option.textContent = `${time} (예약 가능)`;
                             timeSelect.appendChild(option);
                         });
                     }
@@ -840,7 +1014,7 @@
             
             const formData = {
                 service_id: parseInt(document.getElementById('booking-service').value),
-                provider_id: parseInt(document.getElementById('booking-provider').value),
+                provider_id: document.getElementById('booking-provider').value ? parseInt(document.getElementById('booking-provider').value) : null,
                 date: document.getElementById('booking-date').value,
                 time: document.getElementById('booking-time').value,
                 notes: document.getElementById('booking-notes').value
@@ -862,7 +1036,19 @@
                     document.getElementById('booking-time').innerHTML = '<option value="">날짜를 먼저 선택하세요</option>';
                 } else {
                     const error = await response.json();
-                    showAlert(`예약 실패: ${JSON.stringify(error)}`, 'danger');
+                    let errorMessage = '예약에 실패했습니다.';
+                    
+                    if (error.error) {
+                        if (error.error === '해당 시간에 이미 예약이 있습니다.') {
+                            errorMessage = '해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.';
+                            // 예약 가능한 시간을 다시 로드
+                            loadAvailableTimes();
+                        } else {
+                            errorMessage = error.error;
+                        }
+                    }
+                    
+                    showAlert(errorMessage, 'danger');
                 }
             } catch (error) {
                 console.error('예약 오류:', error);
@@ -870,9 +1056,193 @@
             }
         });
 
+        // 공지사항 로드 함수
+        async function loadNotices() {
+            try {
+                const response = await fetch('/api/notices/');
+                if (response.ok) {
+                    const notices = await response.json();
+                    displayNotices(notices);
+                } else {
+                    document.getElementById('notices-container').innerHTML = 
+                        `<div class="text-center text-muted py-5">
+                            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning opacity-50"></i>
+                            <p class="h5">공지사항을 불러올 수 없습니다.</p>
+                            <small class="text-muted">잠시 후 다시 시도해주세요.</small>
+                        </div>`;
+                }
+            } catch (error) {
+                console.error('공지사항 로드 실패:', error);
+                document.getElementById('notices-container').innerHTML = 
+                    `<div class="text-center text-muted py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3 text-danger opacity-50"></i>
+                        <p class="h5">공지사항을 불러오는 중 오류가 발생했습니다.</p>
+                        <small class="text-muted">네트워크 연결을 확인하고 다시 시도해주세요.</small>
+                    </div>`;
+            }
+        }
+
+        function displayNotices(notices) {
+            const container = document.getElementById('notices-container');
+            
+            if (notices.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-info-circle fa-3x mb-3 text-primary opacity-50"></i>
+                        <p class="h5">등록된 공지사항이 없습니다.</p>
+                        <small class="text-muted">새로운 공지사항이 등록되면 여기에 표시됩니다.</small>
+                    </div>`;
+                return;
+            }
+
+            const noticesHTML = notices.map(notice => `
+                <div class="notice-item mb-4 p-4 border-0 rounded-3 shadow-sm">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="notice-icon">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="notice-title mb-2 fw-bold text-dark">${notice.title}</h6>
+                            <div class="notice-content text-muted lh-base">${notice.content}</div>
+                            <div class="mt-3">
+                                <small class="text-primary fw-semibold">
+                                    <i class="fas fa-calendar-alt me-1"></i>공지사항
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = noticesHTML;
+        }
+
+        // 공지사항 모달이 열릴 때 공지사항 로드
+        document.getElementById('noticeModal').addEventListener('show.bs.modal', function() {
+            loadNotices();
+        });
+
+        // 시간대 업데이트 감지 및 처리
+        function checkTimeSlotUpdates() {
+            const updateInfo = localStorage.getItem('timeSlotUpdate');
+            if (updateInfo) {
+                try {
+                    const update = JSON.parse(updateInfo);
+                    const currentTime = Date.now();
+                    
+                    // 5분 이내의 업데이트만 처리 (최신성 확인)
+                    if (update.type === 'time_slot_update' && 
+                        (currentTime - update.timestamp) < 300000) {
+                        
+                        // 현재 선택된 날짜와 일치하는지 확인
+                        const selectedDate = document.getElementById('booking-date').value;
+                        if (selectedDate === update.date) {
+                            // 예약 가능한 시간 업데이트
+                            updateAvailableTimes(update.available_times);
+                            showAlert('예약 가능한 시간이 업데이트되었습니다.', 'info');
+                        }
+                        
+                        // 처리된 업데이트 제거
+                        localStorage.removeItem('timeSlotUpdate');
+                    }
+                } catch (error) {
+                    console.error('시간대 업데이트 처리 오류:', error);
+                    localStorage.removeItem('timeSlotUpdate');
+                }
+            }
+        }
+
+        // 예약 가능한 시간 업데이트
+        function updateAvailableTimes(availableTimes) {
+            const timeSelect = document.getElementById('booking-time');
+            const selectedTime = timeSelect.value; // 현재 선택된 시간 저장
+            
+            if (availableTimes.length === 0) {
+                timeSelect.innerHTML = '<option value="">해당 날짜에 예약 가능한 시간이 없습니다. (모든 시간 마감)</option>';
+            } else {
+                timeSelect.innerHTML = '<option value="">시간을 선택하세요</option>';
+                availableTimes.forEach(time => {
+                    const option = document.createElement('option');
+                    option.value = time;
+                    option.textContent = `${time} (예약 가능)`;
+                    timeSelect.appendChild(option);
+                });
+                
+                // 이전에 선택된 시간이 여전히 가능한지 확인하고 선택
+                if (selectedTime && availableTimes.includes(selectedTime)) {
+                    timeSelect.value = selectedTime;
+                }
+            }
+        }
+
+        // postMessage 이벤트 리스너 (다른 창에서의 업데이트 감지)
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'time_slot_update') {
+                const update = event.data;
+                const selectedDate = document.getElementById('booking-date').value;
+                
+                if (selectedDate === update.date) {
+                    updateAvailableTimes(update.available_times);
+                    showAlert('예약 가능한 시간이 실시간으로 업데이트되었습니다.', 'info');
+                }
+            }
+        });
+
+        // 주기적으로 시간대 업데이트 확인 (30초마다)
+        setInterval(checkTimeSlotUpdates, 30000);
+
+        // 새로운 시간대 업데이트 확인 함수
+        async function checkForTimeUpdates() {
+            const serviceId = document.getElementById('booking-service').value;
+            const date = document.getElementById('booking-date').value;
+            
+            if (!serviceId || !date) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/services/${serviceId}/check_time_updates/?date=${date}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // 현재 표시된 시간과 비교하여 업데이트가 필요한지 확인
+                    const currentTimeSelect = document.getElementById('booking-time');
+                    const currentTimes = Array.from(currentTimeSelect.options)
+                        .filter(option => option.value)
+                        .map(option => option.value);
+                    
+                    // 시간대가 변경되었는지 확인
+                    if (JSON.stringify(currentTimes.sort()) !== JSON.stringify(data.available_times.sort())) {
+                        updateAvailableTimes(data.available_times);
+                        showAlert('예약 가능한 시간이 업데이트되었습니다.', 'info');
+                    }
+                }
+            } catch (error) {
+                console.error('시간대 업데이트 확인 실패:', error);
+            }
+        }
+
+        // 더 자주 시간대 업데이트 확인 (10초마다)
+        setInterval(checkForTimeUpdates, 10000);
+
         // 이벤트 리스너
         document.getElementById('booking-service').addEventListener('change', loadAvailableTimes);
         document.getElementById('booking-date').addEventListener('input', loadAvailableTimes);
+        
+        // 지금 예약하기 버튼 클릭 이벤트
+        document.getElementById('booking-now-btn').addEventListener('click', function() {
+            // 로그인 상태 확인
+            const bookingSection = document.getElementById('booking');
+            if (bookingSection && bookingSection.style.display !== 'none') {
+                // 로그인된 상태: 예약 섹션으로 스크롤
+                bookingSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                // 로그인되지 않은 상태: 로그인 페이지로 이동
+                window.location.href = '/login/';
+            }
+        });
 
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {

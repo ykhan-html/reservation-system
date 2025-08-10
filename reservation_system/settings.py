@@ -133,6 +133,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS 설정
 CORS_ALLOW_ALL_ORIGINS = True
 
+# CSRF 설정
+CSRF_COOKIE_SECURE = False  # 개발 환경에서는 False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://221.153.1.217:8000']
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_AGE = 31449600  # 1년
+
+# 세션 설정
+SESSION_COOKIE_SECURE = False  # 개발 환경에서는 False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 1209600  # 2주
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 # REST Framework 설정
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -141,4 +156,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
 }
+
+# Admin 사이트 설정
+ADMIN_SITE_HEADER = "GolfPro 관리"
+ADMIN_SITE_TITLE = "GolfPro 관리"
+ADMIN_SITE_INDEX_TITLE = "GolfPro 관리자 페이지"

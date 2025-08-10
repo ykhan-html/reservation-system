@@ -20,6 +20,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.authtoken import views as auth_views
 
+# Admin 사이트 설정
+admin.site.site_header = settings.ADMIN_SITE_HEADER
+admin.site.site_title = settings.ADMIN_SITE_TITLE
+admin.site.index_title = settings.ADMIN_SITE_INDEX_TITLE
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('booking.urls')),

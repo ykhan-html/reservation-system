@@ -10,6 +10,7 @@ router.register(r'provider-reservations', views.ServiceProviderReservationViewSe
 router.register(r'reservations', views.ReservationViewSet, basename='reservation')
 router.register(r'reviews', views.ReviewViewSet, basename='review')
 router.register(r'business-hours', views.BusinessHoursViewSet)
+router.register(r'notices', views.NoticeViewSet)
 router.register(r'users', views.UserViewSet, basename='user')
 
 urlpatterns = [
@@ -28,4 +29,5 @@ urlpatterns = [
     path('api/profile/update/', views.ProfileUpdateView.as_view(), name='profile_update'),
     path('api/provider/login/', views.ServiceProviderLoginView.as_view(), name='provider_login'),
     path('api/provider/logout/', views.ServiceProviderLogoutView.as_view(), name='provider_logout'),
+    path('api/services/<int:service_id>/check_time_updates/', views.check_time_updates, name='check_time_updates'),
 ] 
