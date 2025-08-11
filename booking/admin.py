@@ -146,17 +146,22 @@ class ReservationAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         """상태 변경 후 메시지 표시"""
         from django.contrib import messages
+        from django.shortcuts import redirect
+        from django.urls import reverse
         
         # 시간대 업데이트 정보가 있는 경우 메시지 추가
         if 'time_slot_update' in request.session:
             update_info = request.session['time_slot_update']
-            messages.info(
+            messages.success(
                 request, 
-                f'예약 상태가 변경되었습니다. 해당 날짜({update_info["date"]})의 예약 가능한 시간이 업데이트되었습니다.'
+                f'예약 상태가 성공적으로 변경되었습니다. 해당 날짜({update_info["date"]})의 예약 가능한 시간이 업데이트되었습니다.'
             )
             del request.session['time_slot_update']
+        else:
+            messages.success(request, f'예약 상태가 성공적으로 변경되었습니다.')
         
-        return super().response_change(request, obj)
+        # 목록 페이지로 리다이렉트
+        return redirect(reverse('admin:booking_reservation_changelist'))
     
     class Media:
         js = ('admin/js/hide_save_buttons.js',)
