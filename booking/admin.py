@@ -10,6 +10,9 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description']
     list_editable = ['is_active']
     ordering = ['name']
+    
+    class Media:
+        js = ('admin/js/hide_save_buttons.js',)
 
 
 @admin.register(ServiceProvider)
@@ -97,6 +100,9 @@ class ServiceAdmin(admin.ModelAdmin):
     )
     readonly_fields = ['created_at', 'updated_at']
     ordering = ['-is_featured', 'name']
+    
+    class Media:
+        js = ('admin/js/hide_save_buttons.js',)
 
 
 @admin.register(Reservation)
@@ -151,6 +157,9 @@ class ReservationAdmin(admin.ModelAdmin):
             del request.session['time_slot_update']
         
         return super().response_change(request, obj)
+    
+    class Media:
+        js = ('admin/js/hide_save_buttons.js',)
 
 
 @admin.register(Review)
@@ -162,6 +171,9 @@ class ReviewAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('reservation__user', 'reservation__service')
+    
+    class Media:
+        js = ('admin/js/hide_save_buttons.js',)
 
 
 @admin.register(BusinessHours)
@@ -172,6 +184,9 @@ class BusinessHoursAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).order_by('day')
+    
+    class Media:
+        js = ('admin/js/hide_save_buttons.js',)
 
 
 @admin.register(Notice)
@@ -194,3 +209,6 @@ class NoticeAdmin(admin.ModelAdmin):
     )
     readonly_fields = ['created_at', 'updated_at']
     ordering = ['-is_pinned', '-priority', '-created_at']
+    
+    class Media:
+        js = ('admin/js/hide_save_buttons.js',)
