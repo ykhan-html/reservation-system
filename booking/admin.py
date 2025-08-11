@@ -141,7 +141,7 @@ class ReservationAdmin(admin.ModelAdmin):
                     'timestamp': str(datetime.now())
                 }
         
-        super().save_model(request, obj, form)
+        super().save_model(request, obj, form, change)
     
     def response_change(self, request, obj):
         """상태 변경 후 메시지 표시"""
